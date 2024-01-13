@@ -9,19 +9,33 @@ INSERT INTO teams ("name", "join_code") VALUES ('alpha', 'alpha');
 INSERT INTO teams ("name", "join_code") VALUES ('beta', 'beta');
 
 -- id: 1
-INSERT INTO games ("tournament_id") VALUES (1);
-
--- id: 1
 INSERT INTO categories ("league_id", "name") VALUES (1, 'alpha');
 -- id: 1
 INSERT INTO prompts ("category_id", "question", "answer") VALUES (
     1, 'alpha', 'alpha'
 );
+-- id: 2
+INSERT INTO prompts ("category_id", "question", "answer") VALUES (
+    1, 'beta', 'beta'
+);
+
 -- id: 1
+INSERT INTO games (
+    "tournament_id", "current_round", "current_round_position"
+) VALUES (1, 1, 1);
+
+-- id: 1
+INSERT INTO game_prompts (
+    "prompt_id", "game_id", "round", "round_position", "opened_at"
+) VALUES (
+    1, 1, 1, 1, '2024-01-13 12:34:56'
+);
+-- id: 2
+-- this one should not be visible yet since it is not open
 INSERT INTO game_prompts (
     "prompt_id", "game_id", "round", "round_position"
 ) VALUES (
-    1, 1, 1, 1
+    2, 1, 1, 2
 );
 
 -- simulate team alpha joining game 1
