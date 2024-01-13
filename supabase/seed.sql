@@ -21,8 +21,10 @@ INSERT INTO prompts ("category_id", "question", "answer") VALUES (
 
 -- id: 1
 INSERT INTO games (
-    "tournament_id", "current_round", "current_round_position"
-) VALUES (1, 1, 1);
+    "tournament_id",
+    "total_rounds",
+    "total_round_positions"
+) VALUES (1, 1, 2);
 
 -- id: 1
 INSERT INTO game_prompts (

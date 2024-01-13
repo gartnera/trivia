@@ -41,9 +41,13 @@ CREATE TABLE games (
 
     created_at TIMESTAMP DEFAULT now(),
     started_at TIMESTAMP,
+    completed_at TIMESTAMP,
 
     current_round INT,
-    current_round_position INT,
+    round_position INT,
+
+    total_rounds INT,
+    total_round_positions INT,
 
     category_bonus_enabled BOOLEAN,
 
