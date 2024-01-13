@@ -112,6 +112,19 @@ WITH CHECK (
     )
 );
 
+CREATE POLICY "team_response_scores"
+ON response_scores
+FOR SELECT USING (
+    response_id IN (
+        SELECT id FROM responses
+        WHERE
+            game_prompt_id IN (
+                SELECT private.get_game_prompts_for_user()
+            )
+    )
+);
+
+
 CREATE FUNCTION private.get_owners_for_leagues()
 RETURNS SETOF bigint
 LANGUAGE sql
@@ -193,5 +206,17 @@ ON responses
 FOR ALL USING (
     game_prompt_id IN (
         SELECT private.get_game_prompts_for_league_owners()
+    )
+);
+
+CREATE POLICY "league_owners_response_scores"
+ON response_scores
+FOR ALL USING (
+    response_id IN (
+        SELECT id FROM responses
+        WHERE
+            game_prompt_id IN (
+                SELECT private.get_game_prompts_for_league_owners()
+            )
     )
 );

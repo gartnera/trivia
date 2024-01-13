@@ -95,8 +95,6 @@ CREATE TABLE game_prompts (
     opened_at TIMESTAMP,
     closed_at TIMESTAMP,
 
-    is_correct BOOLEAN DEFAULT FALSE,
-
     -- do not accept answers beyond this point
     closes_at TIMESTAMP
 );
@@ -108,6 +106,13 @@ CREATE TABLE responses (
     user_id UUID REFERENCES auth.users,
     team_id BIGINT REFERENCES teams ON DELETE CASCADE,
     game_prompt_id BIGINT REFERENCES game_prompts,
-    response TEXT
+    answer TEXT
 );
 ALTER TABLE responses ENABLE ROW LEVEL SECURITY;
+
+CREATE TABLE response_scores (
+    response_id BIGINT REFERENCES responses ON DELETE CASCADE,
+    is_correct BOOLEAN DEFAULT FALSE,
+    is_scored BOOLEAN DEFAULT FALSE
+);
+ALTER TABLE response_scores ENABLE ROW LEVEL SECURITY;
