@@ -28,12 +28,11 @@ INSERT INTO games (
 
 -- id: 1
 INSERT INTO game_prompts (
-    "prompt_id", "game_id", "round", "round_position", "opened_at"
+    "prompt_id", "game_id", "round", "round_position"
 ) VALUES (
-    1, 1, 1, 1, '2024-01-13 12:34:56'
+    1, 1, 1, 1
 );
 -- id: 2
--- this one should not be visible yet since it is not open
 INSERT INTO game_prompts (
     "prompt_id", "game_id", "round", "round_position"
 ) VALUES (
