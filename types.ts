@@ -10,4 +10,5 @@ export type RootStackParamList = {
     id: number,
     team_id: number,
   }
+  Settings: undefined,
 }

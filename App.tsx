@@ -1,7 +1,6 @@
 import 'react-native-url-polyfill/auto'
 import { useState, useEffect } from 'react'
 import { supabase } from './lib/supabase'
-import { View, Text } from 'react-native'
 import { Session } from '@supabase/supabase-js'
 import { NavigationContainer, useNavigation, useRoute } from '@react-navigation/native';
 import { createNativeStackNavigator, NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -11,6 +10,8 @@ import EmailAuth from '~/screens/EmailAuth'
 import Home from '~/screens/Home'
 import Team from './screens/Team'
 import Game from './screens/Game'
+import Settings from './screens/Settings'
+import { Text, Button, Icon } from '@rneui/base';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -26,7 +27,7 @@ export default function App() {
       setSession(session)
     })
   }, [])
-
+  const settingsButton = (navigation: any) => () => <Icon name="settings" onPress={() => navigation.navigate("Settings")}></Icon>
   return (
     <NavigationContainer>
       <Stack.Navigator>
@@ -37,12 +38,23 @@ export default function App() {
           </>
         ) : (
           <>
-            <Stack.Screen name="Home" component={Home} />
-            <Stack.Screen name="Team" component={Team} options={({ route }) => ({ title: route.params.name, headerBackTitle: "Teams" })} />
-            <Stack.Screen name="Game" component={Game} options={({ route }) => ({
+            <Stack.Screen name="Home" component={Home} options={({ route, navigation }) => ({
+              headerRight: settingsButton(navigation),
+              title: "My Teams"
+            })} />
+            <Stack.Screen name="Team" component={Team} options={({ route, navigation }) => ({
+              title: route.params.name,
+              headerBackTitle: "Teams",
+              headerRight: settingsButton(navigation),
+            })} />
+            <Stack.Screen name="Game" component={Game} options={({ route, navigation }) => ({
               title: `Game: ${route.params.id}`,
               headerBackTitle: "Team",
+              headerRight: settingsButton(navigation),
             })} />
+            <Stack.Group screenOptions={{ presentation: 'modal' }}>
+              <Stack.Screen name="Settings" component={Settings} />
+            </Stack.Group>
           </>
         )}
       </Stack.Navigator>

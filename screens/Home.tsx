@@ -53,7 +53,6 @@ export default function Home({ navigation }: HomeScreenProps) {
       <Text h2={true}>Options</Text>
       <Button style={styles.button} title="Create Team"></Button>
       <Button style={styles.button} title="Join Team"></Button>
-      <Button style={styles.button} title="Log Out" onPress={() => supabase.auth.signOut()}></Button>
     </View>
   )
 }
