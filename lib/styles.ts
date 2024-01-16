@@ -2,7 +2,7 @@ import { makeStyles } from "@rneui/themed";
 
 export const useDefaultStyles = makeStyles((theme) => ({
   text: {
-    color: theme.colors.primary,
+    color: theme.colors.black,
   },
   listItem: {
     backgroundColor: theme.colors.searchBg,

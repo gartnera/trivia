@@ -1,9 +1,7 @@
-import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { RootStackParamList } from "~/types";
 import { Text, Button, Skeleton, Card, Dialog, ButtonGroup } from '@rneui/themed';
 import { Alert, View, StyleSheet, Appearance, ColorSchemeName } from "react-native";
 import { supabase } from "~/lib/supabase";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useDidUpdateEffect } from "~/lib/hooks";
 
 const themeOptions = ["auto", "light", "dark"]

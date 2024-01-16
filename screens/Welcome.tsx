@@ -1,20 +1,24 @@
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { View, Text, StyleSheet, Platform } from "react-native"
+import { View, StyleSheet, Platform } from "react-native"
 import { RootStackParamList } from "~/types";
 import * as AppleAuthentication from 'expo-apple-authentication'
 import { supabase } from "~/lib/supabase";
-import { Button, Input } from '@rneui/themed'
+import { Button, useTheme, useThemeMode, Text } from '@rneui/themed'
+import { useDefaultStyles } from "~/lib/styles";
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 type WelcomeScreenProps = NativeStackScreenProps<RootStackParamList, 'Welcome'>;
 
 function getPlatformNativeLogin() {
+  const themeMode = useThemeMode();
+
   if (Platform.OS === 'ios')
     return (
       <AppleAuthentication.AppleAuthenticationButton
         buttonType={AppleAuthentication.AppleAuthenticationButtonType.SIGN_IN}
-        buttonStyle={AppleAuthentication.AppleAuthenticationButtonStyle.BLACK}
+        buttonStyle={themeMode.mode == "light" ? AppleAuthentication.AppleAuthenticationButtonStyle.BLACK : AppleAuthentication.AppleAuthenticationButtonStyle.WHITE}
         cornerRadius={5}
-        style={{ width: 200, height: 64 }}
+        style={lStyles.loginButton}
         onPress={async () => {
           try {
             const credential = await AppleAuthentication.signInAsync({
@@ -53,26 +57,34 @@ function getPlatformNativeLogin() {
 }
 
 export default function Welcome({ navigation, route }: WelcomeScreenProps) {
+  const styles = useDefaultStyles()
   return (
-    <View style={styles.container}>
-      <Text>Welcome!</Text>
-      {getPlatformNativeLogin()}
-      <Button title="Login with Email" onPress={() => navigation.navigate("EmailAuth")}></Button>
-    </View>
+    <SafeAreaView style={{ flex: 1 }}>
+      <View style={{ ...styles.container, ...lStyles.container }}>
+        <Text h3={true} style={styles.text}>Welcome!</Text>
+        <Text>Please login to save your progress and rankings</Text>
+        <View style={lStyles.loginButtons}>
+          {getPlatformNativeLogin()}
+          <Button title="Login with Email" style={lStyles.loginButton} onPress={() => navigation.navigate("EmailAuth")}></Button>
+        </View>
+      </View>
+    </SafeAreaView>
   )
 }
 
-const styles = StyleSheet.create({
+const lStyles = StyleSheet.create({
   container: {
-    marginTop: 40,
-    padding: 12,
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  verticallySpaced: {
-    paddingTop: 4,
-    paddingBottom: 4,
-    alignSelf: 'stretch',
+  loginButtons: {
+    justifyContent: "space-between",
+    alignItems: "center",
   },
-  mt20: {
-    marginTop: 20,
-  },
+  loginButton: {
+    width: 200,
+    height: 64,
+    marginTop: 10,
+  }
 })
