@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, Platform } from "react-native"
 import { RootStackParamList } from "~/types";
 import * as AppleAuthentication from 'expo-apple-authentication'
 import { supabase } from "~/lib/supabase";
-import { Button, Input } from '@rneui/base'
+import { Button, Input } from '@rneui/themed'
 
 type WelcomeScreenProps = NativeStackScreenProps<RootStackParamList, 'Welcome'>;
 

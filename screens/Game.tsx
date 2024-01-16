@@ -1,6 +1,6 @@
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { View, StyleSheet, Pressable } from "react-native";
-import { Text, Button, Skeleton } from '@rneui/base';
+import { Text, Button, Skeleton } from '@rneui/themed';
 import { RootStackParamList } from "~/types";
 import { useEffect, useState } from "react";
 import { Tables } from "~/lib/supabase.types";

@@ -11,25 +11,43 @@ import Home from '~/screens/Home'
 import Team from './screens/Team'
 import Game from './screens/Game'
 import Settings from './screens/Settings'
-import { Text, Button, Icon } from '@rneui/base';
+import { Icon, createTheme, ThemeProvider, useTheme, ThemeMode } from '@rneui/themed';
+import { Appearance, ColorSchemeName, useColorScheme } from 'react-native';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
-export default function App() {
+const theme = createTheme({});
+
+function Navigation() {
   const [session, setSession] = useState<Session | null>(null)
+  const { theme } = useTheme();
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session)
     })
 
-    supabase.auth.onAuthStateChange((_event, session) => {
+    const res = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session)
     })
-  }, [])
+    return () => res.data.subscription.unsubscribe()
+  }, [setSession])
+
   const settingsButton = (navigation: any) => () => <Icon name="settings" onPress={() => navigation.navigate("Settings")}></Icon>
+
   return (
-    <NavigationContainer>
+    <NavigationContainer
+      theme={{
+        colors: {
+          primary: theme.colors.primary,
+          background: theme.colors.background,
+          card: theme.colors.white,
+          text: theme.colors.black,
+          border: theme.colors.secondary,
+          notification: theme.colors.secondary,
+        },
+        dark: theme.mode === 'dark',
+      }}>
       <Stack.Navigator>
         {session == null ? (
           <>
@@ -40,7 +58,7 @@ export default function App() {
           <>
             <Stack.Screen name="Home" component={Home} options={({ route, navigation }) => ({
               headerRight: settingsButton(navigation),
-              title: "My Teams"
+              title: "Home"
             })} />
             <Stack.Screen name="Team" component={Team} options={({ route, navigation }) => ({
               title: route.params.name,
@@ -59,5 +77,15 @@ export default function App() {
         )}
       </Stack.Navigator>
     </NavigationContainer>
+  )
+}
+
+export default function App() {
+  const colorScheme = useColorScheme();
+  theme.mode = colorScheme ? colorScheme : "light";
+  return (
+    <ThemeProvider theme={theme}>
+      <Navigation></Navigation>
+    </ThemeProvider>
   )
 }

@@ -1,10 +1,12 @@
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useEffect, useState } from "react";
 import { View, StyleSheet, Pressable } from "react-native";
-import { Text, Button, Skeleton } from '@rneui/base';
+import { Text, Button, Skeleton, ListItem } from '@rneui/themed';
 import { supabase } from "~/lib/supabase";
 import { Tables } from "~/lib/supabase.types";
 import { RootStackParamList } from "~/types";
+import Heading from "~/components/Heading";
+import { useDefaultStyles } from "~/lib/styles";
 
 type TeamScreenProps = NativeStackScreenProps<RootStackParamList, 'Team'>;
 
@@ -12,6 +14,7 @@ export default function Team({ navigation, route }: TeamScreenProps) {
   const [existingGames, setExistingGames] = useState<Tables<'games'>[]>([]);
   const [isLoading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState('');
+  const styles = useDefaultStyles();
 
   async function getGames() {
     const { data, error, status } = await supabase
@@ -43,36 +46,20 @@ export default function Team({ navigation, route }: TeamScreenProps) {
       <>
         {existingGames.map((t) =>
           <Pressable key={t.id} onPress={() => navigation.navigate("Game", { id: t.id, team_id: route.params.id })}>
-            <View style={styles.teamRow}>
-              <Text>Game {t.id} || Tournament: {t.tournament_id}</Text>
-            </View>
+            <ListItem containerStyle={styles.listItem}>
+              <ListItem.Content>
+                <ListItem.Title style={styles.listTitle}>Game {t.id} || Tournament: {t.tournament_id}</ListItem.Title>
+              </ListItem.Content>
+              <ListItem.Chevron />
+            </ListItem>
           </Pressable>)}
       </>
     )
   }
   return (
     <View style={styles.container}>
-      <Text h2={true}>Current Games</Text>
+      <Heading text="Active Games" iconName="add" iconPress={() => { }}></Heading>
       {renderGames()}
-      <Text h2={true}>Options</Text>
-      <Button style={styles.button} title="Join Game"></Button>
     </View>
   )
 }
-
-const styles = StyleSheet.create({
-  container: {
-    padding: 5,
-  },
-  button: {
-    margin: 5,
-  },
-  teamRow: {
-    margin: 5,
-    padding: 10,
-    backgroundColor: "#fff"
-  },
-  teamSkeleton: {
-    height: 40,
-  }
-})

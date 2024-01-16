@@ -4,7 +4,9 @@ import { View, StyleSheet, Pressable } from "react-native"
 import { RootStackParamList } from "~/types";
 import { supabase } from "~/lib/supabase"
 import { Tables } from "~/lib/supabase.types"
-import { Button, Input, Divider, Text, Card, Skeleton } from '@rneui/base'
+import { Button, Input, Divider, Text, Card, Skeleton, FAB, ListItem, makeStyles } from '@rneui/themed'
+import Heading from "~/components/Heading";
+import { useDefaultStyles } from "~/lib/styles";
 
 type HomeScreenProps = NativeStackScreenProps<RootStackParamList, 'Home'>;
 
@@ -12,6 +14,7 @@ export default function Home({ navigation }: HomeScreenProps) {
   const [existingTeams, setExistingTeams] = useState<Tables<'teams'>[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState('');
+  const styles = useDefaultStyles();
 
   async function getTeams() {
     const { data, error, status } = await supabase
@@ -40,19 +43,23 @@ export default function Home({ navigation }: HomeScreenProps) {
     }
     return (
       <>
-        {existingTeams.map((t) => <Pressable key={t.id} onPress={() => navigation.navigate("Team", { name: t.name!, id: t.id })}><View style={styles.teamRow}><Text>{t.name}</Text></View></Pressable>)}
-        <Divider></Divider>
+        {existingTeams.map((t) => <Pressable key={t.id} onPress={() => navigation.navigate("Team", { name: t.name!, id: t.id })}>
+          <ListItem containerStyle={styles.listItem}>
+            <ListItem.Content>
+              <ListItem.Title style={styles.listTitle}>{t.name}</ListItem.Title>
+            </ListItem.Content>
+            <ListItem.Chevron />
+          </ListItem>
+        </Pressable>)}
       </>
     )
   }
 
   return (
     <View style={styles.container}>
-      <Text h2={true}>My Teams</Text>
+      <Heading text="My Teams" iconName="add" iconPress={() => { }}></Heading>
       {renderTeams()}
-      <Text h2={true}>Options</Text>
-      <Button style={styles.button} title="Create Team"></Button>
-      <Button style={styles.button} title="Join Team"></Button>
+      <Heading text="My Tournaments"></Heading>
     </View>
   )
 }
