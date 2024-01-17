@@ -1,12 +1,13 @@
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { useEffect, useState } from "react"
-import { View, StyleSheet, Pressable } from "react-native"
+import { useCallback, useEffect, useState } from "react"
+import { View, StyleSheet, Pressable, ScrollView, RefreshControl } from "react-native"
 import { RootStackParamList } from "~/types";
 import { supabase } from "~/lib/supabase"
 import { Tables } from "~/lib/supabase.types"
 import { Button, Input, Divider, Text, Card, Skeleton, FAB, ListItem, makeStyles } from '@rneui/themed'
 import Heading from "~/components/Heading";
 import { useDefaultStyles } from "~/lib/styles";
+import { useEffectWithTrigger } from "~/lib/hooks";
 
 type HomeScreenProps = NativeStackScreenProps<RootStackParamList, 'Home'>;
 
@@ -16,7 +17,8 @@ export default function Home({ navigation }: HomeScreenProps) {
   const [loadError, setLoadError] = useState('');
   const styles = useDefaultStyles();
 
-  async function getTeams() {
+  const getTeams = useCallback(async () => {
+    setIsLoading(true);
     const { data, error, status } = await supabase
       .from('teams')
       .select("*")
@@ -26,10 +28,10 @@ export default function Home({ navigation }: HomeScreenProps) {
       return;
     }
     setExistingTeams(data);
-  }
-  useEffect(() => {
-    getTeams()
   }, [])
+  const refreshData = useEffectWithTrigger(() => {
+    getTeams()
+  }, [getTeams])
 
   function renderTeams() {
     if (isLoading) {
@@ -56,11 +58,15 @@ export default function Home({ navigation }: HomeScreenProps) {
   }
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}
+      refreshControl={
+        <RefreshControl refreshing={false} onRefresh={refreshData}></RefreshControl>
+      }
+    >
       <Heading text="My Teams" iconName="add" iconPress={() => { }}></Heading>
       {renderTeams()}
       <Heading text="My Tournaments"></Heading>
-    </View>
+    </ScrollView>
   )
 }
 

@@ -1,12 +1,13 @@
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { useEffect, useState } from "react";
-import { View, StyleSheet, Pressable } from "react-native";
+import { useCallback, useEffect, useState } from "react";
+import { ScrollView, StyleSheet, Pressable, RefreshControl } from "react-native";
 import { Text, Button, Skeleton, ListItem } from '@rneui/themed';
 import { supabase } from "~/lib/supabase";
 import { Tables } from "~/lib/supabase.types";
 import { RootStackParamList } from "~/types";
 import Heading from "~/components/Heading";
 import { useDefaultStyles } from "~/lib/styles";
+import { useEffectWithTrigger } from "~/lib/hooks";
 
 type TeamScreenProps = NativeStackScreenProps<RootStackParamList, 'Team'>;
 
@@ -16,7 +17,8 @@ export default function Team({ navigation, route }: TeamScreenProps) {
   const [loadError, setLoadError] = useState('');
   const styles = useDefaultStyles();
 
-  async function getGames() {
+  const getGames = useCallback(async () => {
+    setLoading(true);
     const { data, error, status } = await supabase
       .from('games')
       .select('*')
@@ -27,10 +29,10 @@ export default function Team({ navigation, route }: TeamScreenProps) {
       return;
     }
     setExistingGames(data);
-  }
-  useEffect(() => {
-    getGames()
   }, [])
+  const refreshData = useEffectWithTrigger(() => {
+    getGames()
+  }, [getGames])
 
   function renderGames() {
     if (isLoading) {
@@ -57,9 +59,12 @@ export default function Team({ navigation, route }: TeamScreenProps) {
     )
   }
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}
+      refreshControl={
+        <RefreshControl refreshing={false} onRefresh={refreshData}></RefreshControl>
+      }>
       <Heading text="Active Games" iconName="add" iconPress={() => { }}></Heading>
       {renderGames()}
-    </View>
+    </ScrollView>
   )
 }

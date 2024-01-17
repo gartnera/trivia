@@ -1,10 +1,12 @@
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { View, StyleSheet, Pressable } from "react-native";
+import { View, StyleSheet, Pressable, ScrollView, RefreshControl } from "react-native";
 import { Text, Button, Skeleton } from '@rneui/themed';
 import { RootStackParamList } from "~/types";
 import { useEffect, useState } from "react";
 import { Tables } from "~/lib/supabase.types";
 import { supabase } from "~/lib/supabase";
+import { useEffectWithTrigger } from "~/lib/hooks";
+import Heading from "~/components/Heading";
 
 type GameScreenProps = NativeStackScreenProps<RootStackParamList, 'Game'>;
 
@@ -26,7 +28,7 @@ export default function Game({ navigation, route }: GameScreenProps) {
     }
     setGame(data);
   }
-  useEffect(() => {
+  const refreshData = useEffectWithTrigger(() => {
     getGame()
     const gameChanges = supabase
       .channel('changes')
@@ -56,33 +58,27 @@ export default function Game({ navigation, route }: GameScreenProps) {
     if (loadError) {
       return <><Text>Unable to load game: {loadError}</Text></>
     }
-    const gameDetails = (
-      <>
-        <Text>Number of rounds: {game.total_rounds}</Text>
-        <Text>Questions per round: {game.total_round_positions}</Text>
-      </>
-    )
-    let status = "Unknown";
     if (!game.started_at) {
-      status = "waiting for game start"
-    } else {
-      status = "started"
+      return <View style={styles.centeredView}><Text h3={true}>The game will start soon!</Text></View>
     }
-    if (game.current_round) {
-      status = `game in progress (round ${game.current_round} question ${game.round_position}`
-    }
-    return <><Text>Status: {status}</Text>{gameDetails}</>
+    return <>
+      <Heading text={`Round ${game.current_round}, Question ${game.round_position}`}></Heading>
+    </>
   }
 
   return (
-    <View style={styles.container}>
+    <ScrollView contentContainerStyle={styles.container}
+      refreshControl={
+        <RefreshControl refreshing={false} onRefresh={refreshData}></RefreshControl>
+      }>
       {renderGame()}
-    </View>
+    </ScrollView>
   )
 }
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
     padding: 5,
   },
   button: {
@@ -95,5 +91,10 @@ const styles = StyleSheet.create({
   },
   teamSkeleton: {
     height: 40,
-  }
+  },
+  centeredView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
 })
