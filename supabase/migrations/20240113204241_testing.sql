@@ -69,6 +69,7 @@ VALUES (
     NULL,
     '',
     NULL
-);
+)
+ON CONFLICT DO NOTHING;
 END;
 $$;

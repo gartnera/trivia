@@ -48,6 +48,7 @@ CREATE TABLE games (
 
     total_rounds INT,
     total_round_positions INT,
+    advance_ctr INT DEFAULT 0,
 
     category_bonus_enabled BOOLEAN,
 
@@ -58,7 +59,9 @@ COMMENT ON COLUMN games.join_code IS 'team must enter join code every game to en
 
 CREATE TABLE team_games (
     game_id BIGINT REFERENCES games ON DELETE CASCADE NOT NULL,
-    team_id BIGINT REFERENCES teams ON DELETE CASCADE NOT NULL
+    team_id BIGINT REFERENCES teams ON DELETE CASCADE NOT NULL,
+    joined_at TIMESTAMP DEFAULT now(),
+    UNIQUE (team_id, game_id)
 );
 ALTER TABLE team_games ENABLE ROW LEVEL SECURITY;
 COMMENT ON TABLE team_games IS 'games a team is participating in';

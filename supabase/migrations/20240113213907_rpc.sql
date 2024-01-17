@@ -19,6 +19,10 @@ BEGIN
         RAISE EXCEPTION 'Game completed';
     END IF;
 
+    UPDATE games
+        SET advance_ctr = advance_ctr + 1
+        WHERE id = _current_game.id;
+
     IF _current_game.started_at IS NULL THEN
         -- this is the first call
         UPDATE games
