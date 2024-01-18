@@ -23,8 +23,9 @@ INSERT INTO prompts ("category_id", "question", "answer") VALUES (
 INSERT INTO games (
     "tournament_id",
     "total_rounds",
-    "total_round_positions"
-) VALUES (1, 1, 2);
+    "total_round_positions",
+    "join_code"
+) VALUES (1, 1, 2, 'join_code');
 
 -- id: 1
 INSERT INTO game_prompts (

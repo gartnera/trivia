@@ -76,4 +76,34 @@ BEGIN
         round_position = _next_game_prompt.round_position
         WHERE games.id = _current_game.id;
 END;
+$$;
+
+CREATE OR REPLACE PROCEDURE join_game(
+    team_id bigint,
+    join_code text
+)
+LANGUAGE plpgsql
+SECURITY DEFINER SET search_path = public
+AS $$
+#variable_conflict use_variable
+DECLARE
+    _game RECORD;
+BEGIN
+    SELECT * INTO _game FROM games AS g WHERE LOWER(g.join_code) = LOWER(join_code) AND g.completed_at IS NULL;
+    IF NOT FOUND THEN
+        RAISE EXCEPTION 'No active game found';
+    END IF;
+
+    IF _game.completed_at IS NOT NULL THEN
+        RAISE EXCEPTION 'Game already completed';
+    END IF;
+
+    PERFORM NULL FROM teams AS t WHERE t.id = team_id AND t.id IN (SELECT private.get_teams_for_user());
+    IF NOT FOUND THEN
+        RAISE EXCEPTION 'No team found: %', team_id;
+    END IF;
+
+    -- if team is already a member (conflict) do nothing
+    INSERT INTO team_games ("game_id", "team_id") VALUES (_game.id, team_id) ON CONFLICT DO NOTHING;
+END;
 $$
