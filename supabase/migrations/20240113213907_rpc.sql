@@ -106,4 +106,24 @@ BEGIN
     -- if team is already a member (conflict) do nothing
     INSERT INTO team_games ("game_id", "team_id") VALUES (_game.id, team_id) ON CONFLICT DO NOTHING;
 END;
+$$;
+
+CREATE OR REPLACE PROCEDURE join_team(
+    join_code text
+)
+LANGUAGE plpgsql
+SECURITY DEFINER SET search_path = public
+AS $$
+#variable_conflict use_variable
+DECLARE
+    _team RECORD;
+BEGIN
+    SELECT * INTO _team FROM teams AS t WHERE LOWER(t.join_code) = LOWER(join_code);
+    IF NOT FOUND THEN
+        RAISE EXCEPTION 'No team found';
+    END IF;
+
+    -- if team is already a member (conflict) do nothing
+    INSERT INTO team_members ("team_id", "user_id") VALUES (_team.id, auth.uid()) ON CONFLICT DO NOTHING;
+END;
 $$
