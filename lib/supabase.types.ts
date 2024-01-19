@@ -160,6 +160,7 @@ export interface Database {
       }
       games: {
         Row: {
+          advance_ctr: number | null
           category_bonus_enabled: boolean | null
           completed_at: string | null
           created_at: string | null
@@ -173,6 +174,7 @@ export interface Database {
           tournament_id: number
         }
         Insert: {
+          advance_ctr?: number | null
           category_bonus_enabled?: boolean | null
           completed_at?: string | null
           created_at?: string | null
@@ -186,6 +188,7 @@ export interface Database {
           tournament_id: number
         }
         Update: {
+          advance_ctr?: number | null
           category_bonus_enabled?: boolean | null
           completed_at?: string | null
           created_at?: string | null
@@ -364,14 +367,17 @@ export interface Database {
       team_games: {
         Row: {
           game_id: number
+          joined_at: string | null
           team_id: number
         }
         Insert: {
           game_id: number
+          joined_at?: string | null
           team_id: number
         }
         Update: {
           game_id?: number
+          joined_at?: string | null
           team_id?: number
         }
         Relationships: [
@@ -503,6 +509,19 @@ export interface Database {
       advance_game: {
         Args: {
           game_id: number
+        }
+        Returns: undefined
+      }
+      join_game: {
+        Args: {
+          team_id: number
+          join_code: string
+        }
+        Returns: undefined
+      }
+      join_team: {
+        Args: {
+          join_code: string
         }
         Returns: undefined
       }

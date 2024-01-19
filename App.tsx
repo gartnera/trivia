@@ -1,18 +1,20 @@
-import 'react-native-url-polyfill/auto'
-import { useState, useEffect } from 'react'
-import { supabase } from './lib/supabase'
-import { Session } from '@supabase/supabase-js'
-import { NavigationContainer, useNavigation, useRoute } from '@react-navigation/native';
-import { createNativeStackNavigator, NativeStackScreenProps } from '@react-navigation/native-stack';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { Icon, ThemeProvider, createTheme, useTheme } from '@rneui/themed';
+import { Session } from '@supabase/supabase-js';
+import { useEffect, useState } from 'react';
+import { useColorScheme } from 'react-native';
+import 'react-native-url-polyfill/auto';
+import EmailAuth from '~/screens/EmailAuth';
+import Home from '~/screens/Home';
+import Welcome from '~/screens/Welcome';
 import { RootStackParamList } from '~/types';
-import Welcome from '~/screens/Welcome'
-import EmailAuth from '~/screens/EmailAuth'
-import Home from '~/screens/Home'
-import Team from './screens/Team'
-import Game from './screens/Game'
-import Settings from './screens/Settings'
-import { Icon, createTheme, ThemeProvider, useTheme, ThemeMode } from '@rneui/themed';
-import { Appearance, ColorSchemeName, useColorScheme } from 'react-native';
+import { supabase } from './lib/supabase';
+import Game from './screens/Game';
+import Team from './screens/Team';
+import AddGame from './screens/modals/AddGame';
+import AddTeam from './screens/modals/AddTeam';
+import Settings from './screens/modals/Settings';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -72,6 +74,12 @@ function Navigation() {
             })} />
             <Stack.Group screenOptions={{ presentation: 'modal' }}>
               <Stack.Screen name="Settings" component={Settings} />
+            </Stack.Group>
+            <Stack.Group screenOptions={{ presentation: 'modal' }}>
+              <Stack.Screen name="AddTeam" component={AddTeam} options={{ title: "Add Team" }} />
+            </Stack.Group>
+            <Stack.Group screenOptions={{ presentation: 'modal' }}>
+              <Stack.Screen name="AddGame" component={AddGame} options={{ title: "Add Game" }} />
             </Stack.Group>
           </>
         )}

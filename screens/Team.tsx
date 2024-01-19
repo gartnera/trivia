@@ -1,13 +1,13 @@
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { Button, ListItem, Skeleton, Text } from '@rneui/themed';
 import { useCallback, useEffect, useState } from "react";
-import { ScrollView, StyleSheet, Pressable, RefreshControl } from "react-native";
-import { Text, Button, Skeleton, ListItem } from '@rneui/themed';
+import { Pressable, RefreshControl, ScrollView, StyleSheet } from "react-native";
+import Heading from "~/components/Heading";
+import { useEffectWithTrigger } from "~/lib/hooks";
+import { useDefaultStyles } from "~/lib/styles";
 import { supabase } from "~/lib/supabase";
 import { Tables } from "~/lib/supabase.types";
 import { RootStackParamList } from "~/types";
-import Heading from "~/components/Heading";
-import { useDefaultStyles } from "~/lib/styles";
-import { useEffectWithTrigger } from "~/lib/hooks";
 
 type TeamScreenProps = NativeStackScreenProps<RootStackParamList, 'Team'>;
 
@@ -32,7 +32,7 @@ export default function Team({ navigation, route }: TeamScreenProps) {
   }, [])
   const refreshData = useEffectWithTrigger(() => {
     getGames()
-  }, [getGames])
+  }, [getGames, route])
 
   function renderGames() {
     if (isLoading) {
@@ -63,7 +63,7 @@ export default function Team({ navigation, route }: TeamScreenProps) {
       refreshControl={
         <RefreshControl refreshing={false} onRefresh={refreshData}></RefreshControl>
       }>
-      <Heading text="Active Games" iconName="add" iconPress={() => { }}></Heading>
+      <Heading text="Active Games" iconName="add" iconPress={() => navigation.navigate("AddGame", { team_id: route.params.id, team_name: route.params.name })}></Heading>
       {renderGames()}
     </ScrollView>
   )

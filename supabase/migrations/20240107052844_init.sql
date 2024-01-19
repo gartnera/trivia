@@ -31,7 +31,8 @@ ALTER TABLE teams ENABLE ROW LEVEL SECURITY;
 -- users on a team
 CREATE TABLE team_members (
     user_id UUID REFERENCES auth.users ON DELETE CASCADE NOT NULL,
-    team_id BIGINT REFERENCES teams ON DELETE CASCADE NOT NULL
+    team_id BIGINT REFERENCES teams ON DELETE CASCADE NOT NULL,
+    UNIQUE (user_id, team_id)
 );
 ALTER TABLE team_members ENABLE ROW LEVEL SECURITY;
 

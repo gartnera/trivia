@@ -78,10 +78,10 @@ BEGIN
 END;
 $$;
 
-CREATE OR REPLACE PROCEDURE join_game(
+CREATE OR REPLACE FUNCTION join_game(
     team_id bigint,
     join_code text
-)
+) RETURNS void
 LANGUAGE plpgsql
 SECURITY DEFINER SET search_path = public
 AS $$
@@ -108,9 +108,10 @@ BEGIN
 END;
 $$;
 
-CREATE OR REPLACE PROCEDURE join_team(
+CREATE OR REPLACE FUNCTION join_team(
     join_code text
 )
+RETURNS void
 LANGUAGE plpgsql
 SECURITY DEFINER SET search_path = public
 AS $$

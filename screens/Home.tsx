@@ -11,7 +11,7 @@ import { useEffectWithTrigger } from "~/lib/hooks";
 
 type HomeScreenProps = NativeStackScreenProps<RootStackParamList, 'Home'>;
 
-export default function Home({ navigation }: HomeScreenProps) {
+export default function Home({ navigation, route }: HomeScreenProps) {
   const [existingTeams, setExistingTeams] = useState<Tables<'teams'>[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState('');
@@ -31,7 +31,7 @@ export default function Home({ navigation }: HomeScreenProps) {
   }, [])
   const refreshData = useEffectWithTrigger(() => {
     getTeams()
-  }, [getTeams])
+  }, [getTeams, route])
 
   function renderTeams() {
     if (isLoading) {
@@ -63,7 +63,7 @@ export default function Home({ navigation }: HomeScreenProps) {
         <RefreshControl refreshing={false} onRefresh={refreshData}></RefreshControl>
       }
     >
-      <Heading text="My Teams" iconName="add" iconPress={() => { }}></Heading>
+      <Heading text="My Teams" iconName="add" iconPress={()=>navigation.navigate("AddTeam")}></Heading>
       {renderTeams()}
       <Heading text="My Tournaments"></Heading>
     </ScrollView>
