@@ -12,12 +12,22 @@
       }
     },
     "preview": {
+      "channel": "preview",
       "distribution": "internal",
       "env": {
         "APP_VARIANT": "preview"
       }
     },
-    "production": {}
+    "testflight": {
+      "channel": "preview",
+      "distribution": "store",
+      "env": {
+        "APP_VARIANT": "preview"
+      }
+    },
+    "production": {
+      "channel": "production"
+    }
   },
   "submit": {
     "production": {}

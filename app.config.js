@@ -35,7 +35,8 @@ export default {
   "expo": {
     "name": `SD Trivia${getNameSuffix()}`,
     "slug": "trivia",
-    "version": "0.0.2",
+    "version": "0.0.3",
+    "runtimeVersion": "0.0.3",
     "orientation": "portrait",
     "icon": getIcon(),
     "userInterfaceStyle": "automatic",
@@ -72,8 +73,12 @@ export default {
       "tsconfigPaths": true
     },
     "plugins": [
+      "expo-updates",
       "expo-apple-authentication"
     ],
     "owner": "agartner",
+    "updates": {
+      "url": "https://u.expo.dev/a8211f7d-beff-491c-91b1-b5340d8b1209"
+    }
   }
 }

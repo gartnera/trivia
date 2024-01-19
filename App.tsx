@@ -15,6 +15,7 @@ import Team from './screens/Team';
 import AddGame from './screens/modals/AddGame';
 import AddTeam from './screens/modals/AddTeam';
 import Settings from './screens/modals/Settings';
+import * as Updates from 'expo-updates';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -91,6 +92,10 @@ function Navigation() {
 export default function App() {
   const colorScheme = useColorScheme();
   theme.mode = colorScheme ? colorScheme : "light";
+
+  useEffect(() => {
+    console.log(`updates config: channel ${Updates.channel}, auto: ${Updates.checkAutomatically}`)
+  }, []);
   return (
     <ThemeProvider theme={theme}>
       <Navigation></Navigation>
