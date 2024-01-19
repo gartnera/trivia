@@ -35,7 +35,7 @@ export default {
   "expo": {
     "name": `SD Trivia${getNameSuffix()}`,
     "slug": "trivia",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "orientation": "portrait",
     "icon": getIcon(),
     "userInterfaceStyle": "automatic",
@@ -51,6 +51,7 @@ export default {
       "supportsTablet": true,
       "requireFullScreen": true,
       "bundleIdentifier": `com.agartner.trivia${getIdSuffix()}`,
+      "usesAppleSignIn": true,
     },
     "android": {
       "adaptiveIcon": {
@@ -70,6 +71,9 @@ export default {
     "experiments": {
       "tsconfigPaths": true
     },
+    "plugins": [
+      "expo-apple-authentication"
+    ],
     "owner": "agartner",
   }
 }
