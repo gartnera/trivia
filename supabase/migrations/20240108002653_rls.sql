@@ -50,6 +50,12 @@ FOR ALL USING (
     )
 );
 
+CREATE POLICY "new_team"
+ON teams
+FOR INSERT WITH CHECK (
+    TRUE
+);
+
 CREATE POLICY "team_members"
 ON team_members
 FOR ALL USING (

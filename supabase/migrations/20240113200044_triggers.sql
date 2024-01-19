@@ -12,7 +12,9 @@ FOR EACH ROW
 EXECUTE FUNCTION private.populate_user_id();
 
 CREATE OR REPLACE FUNCTION private.team_creator_member()
-RETURNS TRIGGER AS $$
+RETURNS TRIGGER
+SECURITY DEFINER SET search_path = public
+AS $$
 BEGIN
     IF auth.uid() IS NULL THEN
         RETURN NEW;
@@ -20,6 +22,8 @@ BEGIN
 
     INSERT INTO team_members ("team_id", "user_id")
         VALUES (NEW.id, auth.uid());
+        
+    RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 

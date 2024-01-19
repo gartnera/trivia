@@ -11,7 +11,8 @@ type AddTeamProps = NativeStackScreenProps<RootStackParamList, 'AddTeam'>;
 export default function AddTeam({ navigation }: AddTeamProps) {
   const [code, setCode] = useState('');
   const [teamName, setTeamName] = useState('');
-  const [error, setError] = useState('');
+  const [joinError, setJoinError] = useState('');
+  const [createError, setCreateError] = useState('');
 
   const goHomeWithRefresh = () => {
     navigation.goBack();
@@ -21,24 +22,33 @@ export default function AddTeam({ navigation }: AddTeamProps) {
   const joinTeam = useCallback(async () => {
     const res = await supabase.rpc("join_team", { join_code: code })
     if (res.error) {
-      setError(res.error.message);
+      setJoinError(res.error.message);
       return;
     }
     goHomeWithRefresh();
-  }, [code, setError])
+  }, [code, setJoinError])
+
+  const addTeam = useCallback(async () => {
+    const res = await supabase.from('teams').insert({ name: teamName })
+    if (res.error) {
+      setCreateError(res.error.message);
+      return;
+    }
+    goHomeWithRefresh();
+  }, [teamName, setCreateError])
+
   return (
     <View style={styles.container}>
       <View>
         <Heading text='Join Team'></Heading>
-        <Input value={code} onChangeText={setCode} placeholder='code' errorMessage={error}></Input>
+        <Input value={code} onChangeText={setCode} placeholder='Code' errorMessage={joinError}></Input>
         <Button title={"Join"} onPress={joinTeam}></Button>
       </View>
       <Divider style={styles.divider}></Divider>
       <View>
         <Heading text='Add Team'></Heading>
-        <Text>Not implemented</Text>
-        <Input value={teamName} onChangeText={setTeamName} placeholder='team name' errorMessage={error}></Input>
-        <Button title={"Create"}></Button>
+        <Input value={teamName} onChangeText={setTeamName} placeholder='Team Name' errorMessage={createError}></Input>
+        <Button title={"Create"} onPress={addTeam}></Button>
       </View>
     </View>
   )
