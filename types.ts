@@ -14,6 +14,10 @@ export type RootStackParamList = {
     team_id: number,
   }
   AddTeam: undefined,
+  TeamInfo: {
+    team_id: number,
+    team_name: string,
+  }
   AddGame: {
     team_id: number,
     team_name: string,

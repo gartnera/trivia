@@ -3,7 +3,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Icon, ThemeProvider, createTheme, useTheme } from '@rneui/themed';
 import { Session } from '@supabase/supabase-js';
 import { useEffect, useState } from 'react';
-import { useColorScheme } from 'react-native';
+import { View, useColorScheme } from 'react-native';
 import 'react-native-url-polyfill/auto';
 import EmailAuth from '~/screens/EmailAuth';
 import Home from '~/screens/Home';
@@ -16,6 +16,7 @@ import AddGame from './screens/modals/AddGame';
 import AddTeam from './screens/modals/AddTeam';
 import Settings from './screens/modals/Settings';
 import * as Updates from 'expo-updates';
+import TeamInfo from './screens/modals/TeamInfo';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -37,6 +38,10 @@ function Navigation() {
   }, [setSession])
 
   const settingsButton = (navigation: any) => () => <Icon name="settings" onPress={() => navigation.navigate("Settings")}></Icon>
+
+  const teamInfoButton = (navigation: any) => (team_id: number, team_name: string) => {
+    return <Icon name="info-outline" style={{ marginRight: 7 }} onPress={() => navigation.navigate("TeamInfo", { team_id, team_name })}></Icon>
+  }
 
   return (
     <NavigationContainer
@@ -66,7 +71,7 @@ function Navigation() {
             <Stack.Screen name="Team" component={Team} options={({ route, navigation }) => ({
               title: route.params.name,
               headerBackTitle: "Teams",
-              headerRight: settingsButton(navigation),
+              headerRight: () => <>{teamInfoButton(navigation)(route.params.id, route.params.name)}{settingsButton(navigation)()}</>,
             })} />
             <Stack.Screen name="Game" component={Game} options={({ route, navigation }) => ({
               title: `Game: ${route.params.id}`,
@@ -81,6 +86,9 @@ function Navigation() {
             </Stack.Group>
             <Stack.Group screenOptions={{ presentation: 'modal' }}>
               <Stack.Screen name="AddGame" component={AddGame} options={{ title: "Add Game" }} />
+            </Stack.Group>
+            <Stack.Group screenOptions={{ presentation: 'modal' }}>
+              <Stack.Screen name="TeamInfo" component={TeamInfo} options={{ title: "Team Info" }} />
             </Stack.Group>
           </>
         )}

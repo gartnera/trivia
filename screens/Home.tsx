@@ -63,7 +63,7 @@ export default function Home({ navigation, route }: HomeScreenProps) {
         <RefreshControl refreshing={false} onRefresh={refreshData}></RefreshControl>
       }
     >
-      <Heading text="My Teams" iconName="add" iconPress={()=>navigation.navigate("AddTeam")}></Heading>
+      <Heading text="My Teams" iconName="add" iconPress={() => navigation.navigate("AddTeam")}></Heading>
       {renderTeams()}
       <Heading text="My Tournaments"></Heading>
     </ScrollView>

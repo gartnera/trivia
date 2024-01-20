@@ -166,7 +166,7 @@ export interface Database {
           created_at: string | null
           current_round: number | null
           id: number
-          join_code: string | null
+          join_code: string
           round_position: number | null
           started_at: string | null
           total_round_positions: number | null
@@ -180,7 +180,7 @@ export interface Database {
           created_at?: string | null
           current_round?: number | null
           id?: never
-          join_code?: string | null
+          join_code: string
           round_position?: number | null
           started_at?: string | null
           total_round_positions?: number | null
@@ -194,7 +194,7 @@ export interface Database {
           created_at?: string | null
           current_round?: number | null
           id?: never
-          join_code?: string | null
+          join_code?: string
           round_position?: number | null
           started_at?: string | null
           total_round_positions?: number | null
@@ -431,20 +431,20 @@ export interface Database {
         Row: {
           created_at: string | null
           id: number
-          join_code: string | null
-          name: string | null
+          join_code: string
+          name: string
         }
         Insert: {
           created_at?: string | null
           id?: never
-          join_code?: string | null
-          name?: string | null
+          join_code: string
+          name: string
         }
         Update: {
           created_at?: string | null
           id?: never
-          join_code?: string | null
-          name?: string | null
+          join_code?: string
+          name?: string
         }
         Relationships: []
       }
