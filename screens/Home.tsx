@@ -39,7 +39,7 @@ export default function Home({ navigation, route }: HomeScreenProps) {
       setLoadError(`code: ${error.code} message: ${error.message}`);
       return;
     }
-    setTournaments(tournaments);
+    setTournaments(data);
   }, [])
   const refreshData = useEffectWithTrigger(() => {
     getTeams()
@@ -77,7 +77,7 @@ export default function Home({ navigation, route }: HomeScreenProps) {
     return (
       <>
         <Heading text="My Tournaments"></Heading>
-        {tournaments.map((t) => <Pressable key={t.id} onPress={() => navigation.navigate("Team", { name: t.name!, id: t.id })}>
+        {tournaments.map((t) => <Pressable key={t.id} onPress={() => navigation.navigate("TournamentOwner", { name: t.name!, id: t.id })}>
           <ListItem containerStyle={styles.listItem}>
             <ListItem.Content>
               <ListItem.Title style={styles.listTitle}>{t.name}</ListItem.Title>

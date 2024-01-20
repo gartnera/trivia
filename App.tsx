@@ -17,6 +17,8 @@ import AddTeam from './screens/modals/AddTeam';
 import Settings from './screens/modals/Settings';
 import * as Updates from 'expo-updates';
 import TeamInfo from './screens/modals/TeamInfo';
+import TournamentOwner from './screens/TournamentOwner';
+import GameOwner from './screens/GameOwner';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -76,6 +78,16 @@ function Navigation() {
             <Stack.Screen name="Game" component={Game} options={({ route, navigation }) => ({
               title: `Game: ${route.params.id}`,
               headerBackTitle: "Team",
+              headerRight: settingsButton(navigation),
+            })} />
+            <Stack.Screen name="TournamentOwner" component={TournamentOwner} options={({ route, navigation }) => ({
+              title: `${route.params.name} 🧑‍⚖️`,
+              headerBackTitle: "Home",
+              headerRight: settingsButton(navigation),
+            })} />
+            <Stack.Screen name="GameOwner" component={GameOwner} options={({ route, navigation }) => ({
+              title: `Game Control`,
+              headerBackTitle: "🧑‍⚖️",
               headerRight: settingsButton(navigation),
             })} />
             <Stack.Group screenOptions={{ presentation: 'modal' }}>

@@ -29,7 +29,7 @@ export default function AddTeam({ navigation }: AddTeamProps) {
   }, [code, setJoinError])
 
   const addTeam = useCallback(async () => {
-    const res = await supabase.from('teams').insert({ name: teamName })
+    const res = await supabase.from('teams').insert({ name: teamName, })
     if (res.error) {
       setCreateError(res.error.message);
       return;

@@ -13,6 +13,9 @@ export type RootStackParamList = {
     id: number,
     team_id: number,
   }
+  GameOwner: {
+    id: number,
+  }
   AddTeam: undefined,
   TeamInfo: {
     team_id: number,
@@ -23,4 +26,8 @@ export type RootStackParamList = {
     team_name: string,
   },
   Settings: undefined,
+  TournamentOwner: {
+    id: number,
+    name: string,
+  }
 }
