@@ -65,7 +65,7 @@ export interface Database {
           closed_at: string | null
           closes_at: string | null
           created_at: string | null
-          game_id: number | null
+          game_id: number
           id: number
           opened_at: string | null
           prompt_id: number | null
@@ -76,7 +76,7 @@ export interface Database {
           closed_at?: string | null
           closes_at?: string | null
           created_at?: string | null
-          game_id?: number | null
+          game_id: number
           id?: never
           opened_at?: string | null
           prompt_id?: number | null
@@ -87,7 +87,7 @@ export interface Database {
           closed_at?: string | null
           closes_at?: string | null
           created_at?: string | null
-          game_id?: number | null
+          game_id?: number
           id?: never
           opened_at?: string | null
           prompt_id?: number | null
@@ -509,6 +509,14 @@ export interface Database {
       advance_game: {
         Args: {
           game_id: number
+        }
+        Returns: undefined
+      }
+      generate_promptless_game: {
+        Args: {
+          tournament_id: number
+          rounds: number
+          prompts_per_round: number
         }
         Returns: undefined
       }

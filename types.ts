@@ -21,13 +21,18 @@ export type RootStackParamList = {
     team_id: number,
     team_name: string,
   }
-  AddGame: {
+  JoinGame: {
     team_id: number,
     team_name: string,
+  },
+  CreateGame: {
+    tournament_id: number,
+    tournament_name: string,
   },
   Settings: undefined,
   TournamentOwner: {
     id: number,
     name: string,
+    forceRefreshKey?: number,
   }
 }

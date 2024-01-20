@@ -5,9 +5,9 @@ import { StyleSheet, View } from "react-native";
 import { supabase } from '~/lib/supabase';
 import { RootStackParamList } from '~/types';
 
-type AddGameProps = NativeStackScreenProps<RootStackParamList, 'AddGame'>;
+type JoinGameProps = NativeStackScreenProps<RootStackParamList, 'JoinGame'>;
 
-export default function AddGame({ navigation, route }: AddGameProps) {
+export default function JoinGame({ navigation, route }: JoinGameProps) {
   const [code, setCode] = useState('');
   const [error, setError] = useState('');
 

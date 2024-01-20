@@ -12,7 +12,7 @@ import { RootStackParamList } from "~/types";
 type TeamScreenProps = NativeStackScreenProps<RootStackParamList, 'Team'>;
 
 export default function Team({ navigation, route }: TeamScreenProps) {
-  const [existingGames, setExistingGames] = useState<Tables<'games'>[]>([]);
+  const [games, setGames] = useState<Tables<'games'>[]>([]);
   const [isLoading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState('');
   const styles = useDefaultStyles();
@@ -22,13 +22,13 @@ export default function Team({ navigation, route }: TeamScreenProps) {
     const { data, error, status } = await supabase
       .from('games')
       .select('*')
-      .filter("completed_at", "is", null);
+      .order("created_at", { ascending: false })
     setLoading(false);
     if (error) {
       setLoadError(`code: ${error.code} message: ${error.message}`);
       return;
     }
-    setExistingGames(data);
+    setGames(data);
   }, [])
   const refreshData = useEffectWithTrigger(() => {
     getGames()
@@ -38,19 +38,40 @@ export default function Team({ navigation, route }: TeamScreenProps) {
     if (isLoading) {
       return <Skeleton style={styles.teamSkeleton}></Skeleton>
     }
-    if (existingGames.length == 0) {
-      return <><Text>No games</Text></>
+    const activeGames = games.filter((g) => !g.completed_at);
+    if (activeGames.length == 0) {
+      return <><Text style={styles.text}>No active games</Text></>
     }
     if (loadError) {
-      return <><Text>Unable to load teams: {loadError}</Text></>
+      return <><Text style={styles.text}>Unable to load games: {loadError}</Text></>
     }
     return (
       <>
-        {existingGames.map((t) =>
+        {activeGames.map((t) =>
           <Pressable key={t.id} onPress={() => navigation.navigate("Game", { id: t.id, team_id: route.params.id })}>
             <ListItem containerStyle={styles.listItem}>
               <ListItem.Content>
                 <ListItem.Title style={styles.listTitle}>Game {t.id} || Tournament: {t.tournament_id}</ListItem.Title>
+              </ListItem.Content>
+              <ListItem.Chevron />
+            </ListItem>
+          </Pressable>)}
+      </>
+    )
+  }
+  function renderPreviousGames() {
+    const previousGames = games.filter((g) => g.completed_at)
+    if (previousGames.length == 0) {
+      return <></>
+    }
+    return (
+      <>
+        <Heading text="Previous Games"></Heading>
+        {previousGames.map((t) =>
+          <Pressable key={t.id}>
+            <ListItem containerStyle={styles.listItem}>
+              <ListItem.Content>
+                <ListItem.Title style={styles.listTitle}>Game {t.id} || {t.join_code}</ListItem.Title>
               </ListItem.Content>
               <ListItem.Chevron />
             </ListItem>
@@ -63,8 +84,9 @@ export default function Team({ navigation, route }: TeamScreenProps) {
       refreshControl={
         <RefreshControl refreshing={false} onRefresh={refreshData}></RefreshControl>
       }>
-      <Heading text="Active Games" iconName="add" iconPress={() => navigation.navigate("AddGame", { team_id: route.params.id, team_name: route.params.name })}></Heading>
+      <Heading text="Active Games" iconName="add" iconPress={() => navigation.navigate("JoinGame", { team_id: route.params.id, team_name: route.params.name })}></Heading>
       {renderGames()}
+      {renderPreviousGames()}
     </ScrollView>
   )
 }

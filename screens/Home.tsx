@@ -23,6 +23,7 @@ export default function Home({ navigation, route }: HomeScreenProps) {
     const { data, error, status } = await supabase
       .from('teams')
       .select("*")
+      .order("created_at", { ascending: false })
     setIsLoading(false);
     if (error) {
       setLoadError(`code: ${error.code} message: ${error.message}`);
@@ -51,10 +52,10 @@ export default function Home({ navigation, route }: HomeScreenProps) {
       return <Skeleton style={styles.teamSkeleton}></Skeleton>
     }
     if (existingTeams.length == 0) {
-      return <><Text>No Teams</Text></>
+      return <><Text style={styles.text}>No Teams</Text></>
     }
     if (loadError) {
-      return <><Text>Unable to load teams: {loadError}</Text></>
+      return <><Text style={styles.text}>Unable to load teams: {loadError}</Text></>
     }
     return (
       <>

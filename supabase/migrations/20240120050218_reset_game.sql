@@ -14,7 +14,7 @@ BEGIN
     END IF;
 
     -- this should cascade delete response_scores
-    DELETE FROM responses WHERE game_prompt_id IN (SELECT id FROM game_prompts AS gp WHERE gp.game_id = _current_game.id;);
+    DELETE FROM responses WHERE game_prompt_id IN (SELECT id FROM game_prompts AS gp WHERE gp.game_id = _current_game.id);
 
     UPDATE game_prompts AS gp SET opened_at = NULL, closed_at = NULL, closes_at = NULL WHERE gp.game_id = game_id;
 

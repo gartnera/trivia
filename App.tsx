@@ -12,13 +12,14 @@ import { RootStackParamList } from '~/types';
 import { supabase } from './lib/supabase';
 import Game from './screens/Game';
 import Team from './screens/Team';
-import AddGame from './screens/modals/AddGame';
+import JoinGame from './screens/modals/JoinGame';
 import AddTeam from './screens/modals/AddTeam';
 import Settings from './screens/modals/Settings';
 import * as Updates from 'expo-updates';
 import TeamInfo from './screens/modals/TeamInfo';
 import TournamentOwner from './screens/TournamentOwner';
 import GameOwner from './screens/GameOwner';
+import CreateGame from './screens/modals/CreateGame';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -97,10 +98,13 @@ function Navigation() {
               <Stack.Screen name="AddTeam" component={AddTeam} options={{ title: "Add Team" }} />
             </Stack.Group>
             <Stack.Group screenOptions={{ presentation: 'modal' }}>
-              <Stack.Screen name="AddGame" component={AddGame} options={{ title: "Add Game" }} />
+              <Stack.Screen name="JoinGame" component={JoinGame} options={{ title: "Join Game" }} />
             </Stack.Group>
             <Stack.Group screenOptions={{ presentation: 'modal' }}>
               <Stack.Screen name="TeamInfo" component={TeamInfo} options={{ title: "Team Info" }} />
+            </Stack.Group>
+            <Stack.Group screenOptions={{ presentation: 'modal' }}>
+              <Stack.Screen name="CreateGame" component={CreateGame} options={{ title: "Create Promptless Game" }} />
             </Stack.Group>
           </>
         )}

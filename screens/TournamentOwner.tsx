@@ -23,6 +23,7 @@ export default function TournamentOwner({ navigation, route }: TournamentOwnerSc
       .from('games')
       .select('*')
       .filter("tournament_id", "eq", route.params.id)
+      .order("created_at", { ascending: false })
     setLoading(false);
     if (error) {
       setLoadError(`code: ${error.code} message: ${error.message}`);
@@ -34,23 +35,44 @@ export default function TournamentOwner({ navigation, route }: TournamentOwnerSc
     getGames()
   }, [getGames, route])
 
-  function renderGames() {
+  function renderActiveGames() {
     if (isLoading) {
       return <Skeleton style={styles.teamSkeleton}></Skeleton>
     }
-    if (games.length == 0) {
-      return <><Text>No games</Text></>
+    const activeGames = games.filter((g) => !g.completed_at)
+    if (activeGames.length == 0) {
+      return <><Text style={styles.text}>No active games</Text></>
     }
     if (loadError) {
-      return <><Text>Unable to load teams: {loadError}</Text></>
+      return <><Text style={styles.text}>Unable to load games: {loadError}</Text></>
     }
     return (
       <>
-        {games.map((t) =>
+        {activeGames.map((t) =>
           <Pressable key={t.id} onPress={() => navigation.navigate("GameOwner", { id: t.id })}>
             <ListItem containerStyle={styles.listItem}>
               <ListItem.Content>
-                <ListItem.Title style={styles.listTitle}>Game {t.id} || Tournament: {t.tournament_id}</ListItem.Title>
+                <ListItem.Title style={styles.listTitle}>Game {t.id} || {t.join_code}</ListItem.Title>
+              </ListItem.Content>
+              <ListItem.Chevron />
+            </ListItem>
+          </Pressable>)}
+      </>
+    )
+  }
+  function renderPreviousGames() {
+    const previousGames = games.filter((g) => g.completed_at)
+    if (previousGames.length == 0) {
+      return <></>
+    }
+    return (
+      <>
+        <Heading text="Previous Games"></Heading>
+        {previousGames.map((t) =>
+          <Pressable key={t.id}>
+            <ListItem containerStyle={styles.listItem}>
+              <ListItem.Content>
+                <ListItem.Title style={styles.listTitle}>Game {t.id} || {t.join_code}</ListItem.Title>
               </ListItem.Content>
               <ListItem.Chevron />
             </ListItem>
@@ -63,8 +85,9 @@ export default function TournamentOwner({ navigation, route }: TournamentOwnerSc
       refreshControl={
         <RefreshControl refreshing={false} onRefresh={refreshData}></RefreshControl>
       }>
-      <Heading text="Active Games" iconName="add" iconPress={() => navigation.navigate("AddGame", { team_id: route.params.id, team_name: route.params.name })}></Heading>
-      {renderGames()}
+      <Heading text="Active Games" iconName="add" iconPress={() => navigation.navigate("CreateGame", { tournament_id: route.params.id, tournament_name: route.params.name })}></Heading>
+      {renderActiveGames()}
+      {renderPreviousGames()}
     </ScrollView>
   )
 }
