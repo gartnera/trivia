@@ -5,7 +5,7 @@ import { RootStackParamList } from "~/types";
 import { useCallback, useState } from "react";
 import { Tables } from "~/lib/supabase.types";
 import { supabase } from "~/lib/supabase";
-import { useEffectWithTrigger } from "~/lib/hooks";
+import { useEffectWithTrigger, useResumed } from "~/lib/hooks";
 import Heading from "~/components/Heading";
 
 type GameScreenProps = NativeStackScreenProps<RootStackParamList, 'Game'>;
@@ -17,6 +17,7 @@ export default function Game({ navigation, route }: GameScreenProps) {
   const [isLoading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState('');
   const [answer, setAnswer] = useState('');
+  const resumed = useResumed();
 
   // TODO: just query from the view instead
   const getPrompt = async (game: Tables<'games'>) => {
@@ -77,7 +78,7 @@ export default function Game({ navigation, route }: GameScreenProps) {
     return () => {
       gameChanges.unsubscribe();
     }
-  }, [getGame])
+  }, [getGame, resumed])
 
   function renderGame() {
     if (isLoading) {
