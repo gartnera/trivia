@@ -69,7 +69,7 @@ export default function TournamentOwner({ navigation, route }: TournamentOwnerSc
       <>
         <Heading text="Previous Games"></Heading>
         {previousGames.map((t) =>
-          <Pressable key={t.id}>
+          <Pressable key={t.id} onPress={() => navigation.navigate("GameOwner", { id: t.id })}>
             <ListItem containerStyle={styles.listItem}>
               <ListItem.Content>
                 <ListItem.Title style={styles.listTitle}>Game {t.id} || {t.join_code}</ListItem.Title>
