@@ -13,6 +13,7 @@ type HomeScreenProps = NativeStackScreenProps<RootStackParamList, 'Home'>;
 
 export default function Home({ navigation, route }: HomeScreenProps) {
   const [existingTeams, setExistingTeams] = useState<Tables<'teams'>[]>([]);
+  const [tournaments, setTournaments] = useState<Tables<'tournaments'>[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState('');
   const styles = useDefaultStyles();
@@ -29,8 +30,20 @@ export default function Home({ navigation, route }: HomeScreenProps) {
     }
     setExistingTeams(data);
   }, [])
+  const getTournaments = useCallback(async () => {
+    const { data, error, status } = await supabase
+      .from('tournaments')
+      .select("*")
+    setIsLoading(false);
+    if (error) {
+      setLoadError(`code: ${error.code} message: ${error.message}`);
+      return;
+    }
+    setTournaments(tournaments);
+  }, [])
   const refreshData = useEffectWithTrigger(() => {
     getTeams()
+    getTournaments()
   }, [getTeams, route])
 
   function renderTeams() {
@@ -57,6 +70,25 @@ export default function Home({ navigation, route }: HomeScreenProps) {
     )
   }
 
+  function renderTournaments() {
+    if (tournaments.length == 0) {
+      return <></>
+    }
+    return (
+      <>
+        <Heading text="My Tournaments"></Heading>
+        {tournaments.map((t) => <Pressable key={t.id} onPress={() => navigation.navigate("Team", { name: t.name!, id: t.id })}>
+          <ListItem containerStyle={styles.listItem}>
+            <ListItem.Content>
+              <ListItem.Title style={styles.listTitle}>{t.name}</ListItem.Title>
+            </ListItem.Content>
+            <ListItem.Chevron />
+          </ListItem>
+        </Pressable>)}
+      </>
+    )
+  }
+
   return (
     <ScrollView style={styles.container}
       refreshControl={
@@ -65,7 +97,7 @@ export default function Home({ navigation, route }: HomeScreenProps) {
     >
       <Heading text="My Teams" iconName="add" iconPress={() => navigation.navigate("AddTeam")}></Heading>
       {renderTeams()}
-      <Heading text="My Tournaments"></Heading>
+      {renderTournaments()}
     </ScrollView>
   )
 }

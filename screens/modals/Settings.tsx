@@ -8,6 +8,17 @@ const themeOptions = ["auto", "light", "dark"]
 
 export default function Settings() {
   const [themeIndex, setThemeIndex] = useState(0);
+  const [email, setEmail] = useState<string | undefined>(undefined);
+
+  useEffect(() => {
+    (async () => {
+      const user = await supabase.auth.getUser()
+      if (!user.data.user) {
+        return
+      }
+      setEmail(user.data.user.email)
+    })()
+  })
 
   useEffect(() => {
     // WARN: this will never actually return null
@@ -22,6 +33,13 @@ export default function Settings() {
     }
     Appearance.setColorScheme(theme as ColorSchemeName)
   }, [themeIndex])
+
+  function renderEmail() {
+    if (!email) {
+      return
+    }
+    return <Text style={styles.textLine}>Email: {email}</Text>
+  }
 
   return (
     <View>
@@ -39,6 +57,7 @@ export default function Settings() {
         <Card.Title>Account</Card.Title>
         <Button style={styles.button} title="Log Out" onPress={() => supabase.auth.signOut()}></Button>
         <Button style={styles.button} title="Delete Account" color="red" onPress={() => Alert.alert("deletion not implemented")}></Button>
+        {renderEmail()}
       </Card>
     </View>
   )
@@ -58,5 +77,8 @@ const styles = StyleSheet.create({
   },
   teamSkeleton: {
     height: 40,
+  },
+  textLine: {
+    fontSize: 16,
   }
 })
