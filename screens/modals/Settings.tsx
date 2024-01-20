@@ -3,6 +3,8 @@ import { Alert, View, StyleSheet, Appearance, ColorSchemeName } from "react-nati
 import { supabase } from "~/lib/supabase";
 import { useEffect, useState } from "react";
 import { useDidUpdateEffect } from "~/lib/hooks";
+import Constants from 'expo-constants';
+import * as Updates from 'expo-updates';
 
 const themeOptions = ["auto", "light", "dark"]
 
@@ -38,7 +40,19 @@ export default function Settings() {
     if (!email) {
       return
     }
-    return <Text style={styles.textLine}>Email: {email}</Text>
+    return <Text>Email: {email}</Text>
+  }
+
+  async function forceReload() {
+    try {
+      const update = await Updates.checkForUpdateAsync();
+      if (update.isAvailable) {
+        await Updates.fetchUpdateAsync();
+        await Updates.reloadAsync();
+      }
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   return (
@@ -59,6 +73,12 @@ export default function Settings() {
         <Button style={styles.button} title="Delete Account" color="red" onPress={() => Alert.alert("deletion not implemented")}></Button>
         {renderEmail()}
       </Card>
+      <Card>
+        <Card.Title>App Info</Card.Title>
+        <Button style={styles.button} title="Force Reload" color="red" onPress={forceReload}></Button>
+        <Text>Version: {Constants.expoConfig!.version}</Text>
+        <Text>Hash: {Constants.expoConfig!.extra!.gitShortHash}</Text>
+      </Card>
     </View>
   )
 }
@@ -78,7 +98,4 @@ const styles = StyleSheet.create({
   teamSkeleton: {
     height: 40,
   },
-  textLine: {
-    fontSize: 16,
-  }
 })

@@ -31,6 +31,21 @@ function getIcon() {
   return "./assets/icon.png"
 }
 
+function getShortHash() {
+  if (process.env.EAS_BUILD_GIT_COMMIT_HASH) {
+    return process.env.EAS_BUILD_GIT_COMMIT_HASH.slice(0, 8)
+  }
+  const shortHash = require('child_process')
+    .execSync('git rev-parse --short HEAD')
+    .toString().trim();
+
+  const isDirty = require('child_process')
+    .execSync('git diff --quiet || echo "-dirty"')
+    .toString().trim();
+
+  return shortHash + isDirty;
+}
+
 export default {
   "expo": {
     "name": `SD Trivia${getNameSuffix()}`,
@@ -67,7 +82,8 @@ export default {
     "extra": {
       "eas": {
         "projectId": "a8211f7d-beff-491c-91b1-b5340d8b1209"
-      }
+      },
+      "gitShortHash": getShortHash(),
     },
     "experiments": {
       "tsconfigPaths": true
