@@ -1,6 +1,6 @@
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { View, StyleSheet, Pressable, ScrollView, RefreshControl } from "react-native";
-import { Text, Button, Skeleton, Input } from '@rneui/themed';
+import { View, StyleSheet, Pressable, ScrollView, RefreshControl, Alert } from "react-native";
+import { Text, Button, Skeleton, Input, Icon } from '@rneui/themed';
 import { RootStackParamList } from "~/types";
 import { useCallback, useState } from "react";
 import { Tables } from "~/lib/supabase.types";
@@ -16,6 +16,8 @@ export default function Game({ navigation, route }: GameScreenProps) {
   const [positionHash, setPositionHash] = useState<string>("");
   const [isLoading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState('');
+  const [submitError, setSubmitError] = useState('');
+  const [submitState, setSubmitState] = useState<null | 'processing' | 'success'>(null);
   const [answer, setAnswer] = useState('');
   const resumed = useResumed();
 
@@ -55,6 +57,7 @@ export default function Game({ navigation, route }: GameScreenProps) {
       const currentPositionHash = `${data.current_round}|${data.round_position}`;
       if (positionHash != currentPositionHash) {
         setAnswer("");
+        setSubmitState(null);
         setPositionHash(currentPositionHash);
       }
       getPrompt(data)
@@ -78,7 +81,28 @@ export default function Game({ navigation, route }: GameScreenProps) {
     return () => {
       gameChanges.unsubscribe();
     }
-  }, [getGame, resumed])
+  }, [getGame, resumed]);
+
+  const submit = useCallback(async () => {
+    if (!answer) {
+      Alert.alert("You may not submit an empty answer");
+      return;
+    }
+    setSubmitState('processing')
+    const res = await supabase
+      .from("responses")
+      .upsert(
+        { answer: answer, game_prompt_id: prompt!.id, team_id: route.params.team_id },
+        { onConflict: "team_id,game_prompt_id" }
+      );
+    if (res.error) {
+      setSubmitError(`code: ${res.error.code} message: ${res.error.message}`);
+      return;
+    }
+    setSubmitError("");
+    setSubmitState('success')
+  }, [route, game, answer])
+
 
   function renderGame() {
     if (isLoading) {
@@ -96,11 +120,12 @@ export default function Game({ navigation, route }: GameScreenProps) {
     if (game.completed_at) {
       return <View style={styles.centeredView}><Text h3={true}>The game has finished!</Text></View>
     }
-    const disabled = prompt ? prompt.closed_at != null : false;
+    const disabled = prompt && prompt ? prompt.closed_at != null : false;
+    const submitIcon = submitState == 'success' ? <Icon name="done"></Icon> : undefined
     return <>
       <Heading text={`Round ${game.current_round}, Question ${game.round_position}`}></Heading>
-      <Input autoFocus={true} placeholder="Your Answer" onChangeText={setAnswer} value={answer} disabled={disabled}></Input>
-      <Button disabled={disabled}>Submit</Button>
+      <Input autoFocus={true} placeholder="Your Answer" onChangeText={setAnswer} value={answer} disabled={disabled} errorMessage={submitError}></Input>
+      <Button disabled={disabled} loading={submitState == 'processing'} onPress={submit} icon={submitIcon} iconRight={true}>Submit</Button>
     </>
   }
 
