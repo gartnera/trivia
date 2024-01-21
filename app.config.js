@@ -50,8 +50,8 @@ export default {
   "expo": {
     "name": `SD Trivia${getNameSuffix()}`,
     "slug": "trivia",
-    "version": "0.0.3",
-    "runtimeVersion": "0.0.3",
+    "version": "0.0.4",
+    "runtimeVersion": "0.0.4",
     "orientation": "portrait",
     "icon": getIcon(),
     "userInterfaceStyle": "automatic",
@@ -70,14 +70,11 @@ export default {
       "usesAppleSignIn": true,
     },
     "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      },
       "package": `com.agartner.trivia${getIdSuffix()}`
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro"
     },
     "extra": {
       "eas": {
@@ -90,7 +87,8 @@ export default {
     },
     "plugins": [
       "expo-updates",
-      "expo-apple-authentication"
+      "expo-apple-authentication",
+      "@react-native-google-signin/google-signin"
     ],
     "owner": "agartner",
     "updates": {

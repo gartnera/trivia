@@ -1,5 +1,5 @@
 import { Text, Button, Skeleton, Card, Dialog, ButtonGroup } from '@rneui/themed';
-import { Alert, View, StyleSheet, Appearance, ColorSchemeName } from "react-native";
+import { Alert, View, StyleSheet, Appearance, ColorSchemeName, Platform } from "react-native";
 import { supabase } from "~/lib/supabase";
 import { useEffect, useState } from "react";
 import { useDidUpdateEffect } from "~/lib/hooks";
@@ -33,6 +33,10 @@ export default function Settings() {
     if (theme === "auto") {
       theme = null;
     }
+    // theme is not settable on web
+    if (Platform.OS == "web") {
+      return
+    }
     Appearance.setColorScheme(theme as ColorSchemeName)
   }, [themeIndex])
 
@@ -55,18 +59,26 @@ export default function Settings() {
     }
   }
 
+  function renderThemeCard() {
+    // theme is not settable on web
+    if (Platform.OS == "web") {
+      return
+    }
+    return <Card>
+      <Card.Title>Theme</Card.Title>
+      <ButtonGroup
+        buttons={themeOptions}
+        selectedIndex={themeIndex}
+        onPress={(value) => {
+          setThemeIndex(value);
+        }}
+      ></ButtonGroup>
+    </Card>
+  }
+
   return (
     <View>
-      <Card>
-        <Card.Title>Theme</Card.Title>
-        <ButtonGroup
-          buttons={themeOptions}
-          selectedIndex={themeIndex}
-          onPress={(value) => {
-            setThemeIndex(value);
-          }}
-        ></ButtonGroup>
-      </Card>
+      {renderThemeCard()}
       <Card>
         <Card.Title>Account</Card.Title>
         <Button style={styles.button} title="Log Out" onPress={() => supabase.auth.signOut()}></Button>
