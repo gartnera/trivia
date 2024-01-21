@@ -30,7 +30,7 @@ export default function TeamInfo({ navigation, route }: TeamInfoProps) {
         setCodeError(`code: ${error.code} message: ${error.message}`);
         return;
       }
-      setCode(data.join_code);
+      setCode(data.join_code!);
     }
     load()
   }, [route])

@@ -20,6 +20,7 @@ import TeamInfo from './screens/modals/TeamInfo';
 import TournamentOwner from './screens/TournamentOwner';
 import GameOwner from './screens/GameOwner';
 import CreateGame from './screens/modals/CreateGame';
+import AnswerInfo from './screens/modals/AnswerInfo';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -105,6 +106,9 @@ function Navigation() {
             </Stack.Group>
             <Stack.Group screenOptions={{ presentation: 'modal' }}>
               <Stack.Screen name="CreateGame" component={CreateGame} options={{ title: "Create Promptless Game" }} />
+            </Stack.Group>
+            <Stack.Group screenOptions={{ presentation: 'modal' }}>
+              <Stack.Screen name="AnswerInfo" component={AnswerInfo} options={{ title: "Answer Details" }} />
             </Stack.Group>
           </>
         )}

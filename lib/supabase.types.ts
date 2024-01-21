@@ -290,16 +290,19 @@ export interface Database {
           is_correct: boolean | null
           is_scored: boolean | null
           response_id: number | null
+          updated_at: string | null
         }
         Insert: {
           is_correct?: boolean | null
           is_scored?: boolean | null
           response_id?: number | null
+          updated_at?: string | null
         }
         Update: {
           is_correct?: boolean | null
           is_scored?: boolean | null
           response_id?: number | null
+          updated_at?: string | null
         }
         Relationships: [
           {
@@ -308,29 +311,42 @@ export interface Database {
             isOneToOne: false
             referencedRelation: "responses"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "response_scores_response_id_fkey"
+            columns: ["response_id"]
+            isOneToOne: false
+            referencedRelation: "scoring_view"
+            referencedColumns: ["id"]
           }
         ]
       }
       responses: {
         Row: {
           answer: string | null
+          created_at: string | null
           game_prompt_id: number | null
           id: number
           team_id: number | null
+          updated_at: string | null
           user_id: string | null
         }
         Insert: {
           answer?: string | null
+          created_at?: string | null
           game_prompt_id?: number | null
           id?: never
           team_id?: number | null
+          updated_at?: string | null
           user_id?: string | null
         }
         Update: {
           answer?: string | null
+          created_at?: string | null
           game_prompt_id?: number | null
           id?: never
           team_id?: number | null
+          updated_at?: string | null
           user_id?: string | null
         }
         Relationships: [
@@ -476,6 +492,51 @@ export interface Database {
       }
     }
     Views: {
+      scoring_view: {
+        Row: {
+          answer: string | null
+          created_at: string | null
+          game_prompt_id: number | null
+          id: number | null
+          is_correct: boolean | null
+          is_scored: boolean | null
+          score_updated_at: string | null
+          team_id: number | null
+          team_name: string | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "responses_game_prompt_id_fkey"
+            columns: ["game_prompt_id"]
+            isOneToOne: false
+            referencedRelation: "game_prompts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "responses_game_prompt_id_fkey"
+            columns: ["game_prompt_id"]
+            isOneToOne: false
+            referencedRelation: "team_game_prompts"
+            referencedColumns: ["game_prompt_id"]
+          },
+          {
+            foreignKeyName: "responses_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "responses_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
       team_game_prompts: {
         Row: {
           actual_answer: string | null

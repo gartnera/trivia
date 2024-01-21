@@ -1,5 +1,5 @@
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { View, StyleSheet, Pressable, ScrollView, RefreshControl } from "react-native";
+import { View, StyleSheet, Pressable, ScrollView, RefreshControl, ActivityIndicator, Alert } from "react-native";
 import { Text, Button, Skeleton, Input, ListItem, ButtonGroup, Icon } from '@rneui/themed';
 import { RootStackParamList } from "~/types";
 import { useCallback, useState } from "react";
@@ -11,16 +11,18 @@ import { useDefaultStyles } from "~/lib/styles";
 
 type GameOwnerScreenProps = NativeStackScreenProps<RootStackParamList, 'GameOwner'>;
 
+type responseCorrectStates = undefined | null | true | false | 'loading';
+
 export default function GameOwner({ navigation, route }: GameOwnerScreenProps) {
   const [game, setGame] = useState<Tables<'games'> | null>(null);
   const [prompt, setPrompt] = useState<Tables<'game_prompts'> | null>(null);
-  const [responses, setResponses] = useState<Tables<'responses'>[] | null>(null);
+  const [responses, setResponses] = useState<Tables<'scoring_view'>[] | null>(null);
   const [positionHash, setPositionHash] = useState<string>("");
   const [isLoading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState('');
   const [responseLoadError, setResponseLoadError] = useState('');
   const styles = useDefaultStyles();
-  const [responsesCorrect, setReponsesCorrect] = useState<{ [key: number]: boolean }>({})
+  const [responsesCorrect, setReponsesCorrect] = useState<{ [key: number]: responseCorrectStates }>({})
 
   // TODO: just query from the view instead
   const getPrompt = async (game: Tables<'games'>) => {
@@ -120,9 +122,11 @@ export default function GameOwner({ navigation, route }: GameOwnerScreenProps) {
 
   const getReponses = useCallback(async () => {
     const { data, error, status } = await supabase
-      .from('responses')
+      .from('scoring_view')
       .select('*')
       .filter("game_prompt_id", "eq", prompt?.id)
+      .order("is_scored", { ascending: false })
+      .order("created_at")
     setLoading(false);
     if (error) {
       setResponseLoadError(`code: ${error.code} message: ${error.message}`);
@@ -130,6 +134,11 @@ export default function GameOwner({ navigation, route }: GameOwnerScreenProps) {
     }
     setResponseLoadError("");
     setResponses(data);
+    setReponsesCorrect((old) => {
+      const news = { ...old };
+      data.forEach((d) => { news[d.id!] = d.is_correct })
+      return news
+    })
   }, [prompt, setResponses, positionHash])
 
   const refreshResponses = useEffectWithTrigger(() => {
@@ -160,6 +169,36 @@ export default function GameOwner({ navigation, route }: GameOwnerScreenProps) {
     refreshResponses();
   }, [refreshGame, refreshResponses])
 
+  const answerPress = useCallback(async (r: Tables<'scoring_view'>) => {
+    const prevState = responsesCorrect[r.id!];
+    const pendingState = !prevState;
+    setReponsesCorrect((old) => { return { ...old, [r.id!]: 'loading' } })
+    const res = await supabase
+      .from("response_scores")
+      .upsert(
+        { response_id: r.id, is_scored: true, is_correct: pendingState },
+        { onConflict: "response_id" }
+      );
+    let finalState: responseCorrectStates = pendingState;
+    if (res.error) {
+      Alert.alert(res.error.message)
+      finalState = prevState;
+    }
+    setReponsesCorrect((old) => { return { ...old, [r.id!]: finalState } })
+  }, [game, responsesCorrect])
+
+  function renderResponseIcon(r: Tables<'scoring_view'>, correctState: responseCorrectStates) {
+    if (correctState === 'loading') {
+      return <ActivityIndicator></ActivityIndicator>
+    }
+    if (correctState === true) {
+      return <Icon name="check" color="green"></Icon>
+    } else if (correctState === false) {
+      return <Icon name="close" color="red"></Icon>
+    }
+    return <Icon name="help"></Icon>
+  }
+
   function renderResponses() {
     if (responseLoadError) {
       return <><Text>Unable to load responses: {responseLoadError}</Text></>
@@ -170,12 +209,16 @@ export default function GameOwner({ navigation, route }: GameOwnerScreenProps) {
     return (<>
       <Heading text="Answers"></Heading>
       {responses.map((r) =>
-        <Pressable onPress={() => { setReponsesCorrect((old) => { return { ...old, [r.id]: !old[r.id] } }) }}>
-          <ListItem containerStyle={styles.listItem} key={r.id}>
+        <Pressable
+          key={r.id!}
+          onPress={() => { answerPress(r) }}
+          onLongPress={() => { navigation.navigate("AnswerInfo", r) }}
+        >
+          <ListItem containerStyle={styles.listItem} key={r.id!}>
             <ListItem.Content >
               <ListItem.Title style={styles.listTitle}>{r.answer}</ListItem.Title>
             </ListItem.Content>
-            {responsesCorrect[r.id] ? <Icon name="check"></Icon> : <Icon name="help"></Icon>}
+            {renderResponseIcon(r, responsesCorrect[r.id!])}
           </ListItem >
         </Pressable>
       )}
