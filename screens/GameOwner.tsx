@@ -1,22 +1,26 @@
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { View, StyleSheet, Pressable, ScrollView, RefreshControl } from "react-native";
-import { Text, Button, Skeleton, Input } from '@rneui/themed';
+import { Text, Button, Skeleton, Input, ListItem, ButtonGroup, Icon } from '@rneui/themed';
 import { RootStackParamList } from "~/types";
 import { useCallback, useState } from "react";
 import { Tables } from "~/lib/supabase.types";
 import { supabase } from "~/lib/supabase";
 import { useEffectWithTrigger } from "~/lib/hooks";
 import Heading from "~/components/Heading";
+import { useDefaultStyles } from "~/lib/styles";
 
 type GameOwnerScreenProps = NativeStackScreenProps<RootStackParamList, 'GameOwner'>;
 
 export default function GameOwner({ navigation, route }: GameOwnerScreenProps) {
   const [game, setGame] = useState<Tables<'games'> | null>(null);
   const [prompt, setPrompt] = useState<Tables<'game_prompts'> | null>(null);
+  const [responses, setResponses] = useState<Tables<'responses'>[] | null>(null);
   const [positionHash, setPositionHash] = useState<string>("");
   const [isLoading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState('');
-  const [answer, setAnswer] = useState('');
+  const [responseLoadError, setResponseLoadError] = useState('');
+  const styles = useDefaultStyles();
+  const [responsesCorrect, setReponsesCorrect] = useState<{ [key: number]: boolean }>({})
 
   // TODO: just query from the view instead
   const getPrompt = async (game: Tables<'games'>) => {
@@ -53,16 +57,15 @@ export default function GameOwner({ navigation, route }: GameOwnerScreenProps) {
     if (data.current_round != null && data.round_position != null) {
       const currentPositionHash = `${data.current_round}|${data.round_position}`;
       if (positionHash != currentPositionHash) {
-        setAnswer("");
         setPositionHash(currentPositionHash);
       }
       getPrompt(data)
     }
-  }, [setGame, setAnswer, positionHash])
+  }, [setGame, positionHash])
   const refreshGame = useEffectWithTrigger(() => {
     getGame()
     const gameChanges = supabase
-      .channel('changes')
+      .channel('game_changes')
       .on(
         'postgres_changes',
         {
@@ -99,33 +102,98 @@ export default function GameOwner({ navigation, route }: GameOwnerScreenProps) {
 
   function renderGame() {
     if (isLoading) {
-      return <Skeleton style={styles.teamSkeleton}></Skeleton>
+      return <Skeleton style={lStyles.teamSkeleton}></Skeleton>
     }
     if (!game) {
       return <><Text>game is not valid</Text></>
     }
     if (loadError) {
-      return <><Text>Unable to load game: {loadError}</Text></>
+      return <><Text>Unable to load games: {loadError}</Text></>
     }
     const advanceDisabled = game.completed_at != null
     return <>
       <Heading text={`Round ${game.current_round}, Question ${game.round_position}`}></Heading>
-      <Button style={styles.button} disabled={advanceDisabled} onPress={advanceGame}>Advance Game</Button>
-      <Button style={styles.button} onLongPress={resetGame} color="red">Reset Game (long press)</Button>
+      <Button style={lStyles.button} disabled={advanceDisabled} onPress={advanceGame}>Advance Game</Button>
+      <Button style={lStyles.button} onLongPress={resetGame} color="red">Reset Game (long press)</Button>
     </>
   }
 
+  const getReponses = useCallback(async () => {
+    const { data, error, status } = await supabase
+      .from('responses')
+      .select('*')
+      .filter("game_prompt_id", "eq", prompt?.id)
+    setLoading(false);
+    if (error) {
+      setResponseLoadError(`code: ${error.code} message: ${error.message}`);
+      return;
+    }
+    setResponseLoadError("");
+    setResponses(data);
+  }, [prompt, setResponses, positionHash])
+
+  const refreshResponses = useEffectWithTrigger(() => {
+    if (!prompt) {
+      return
+    }
+    getReponses()
+    const responseChanges = supabase
+      .channel('response_changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'responses',
+          filter: `game_prompt_id=eq.${prompt?.id}`,
+        },
+        () => getReponses()
+      )
+      .subscribe();
+    return () => {
+      responseChanges.unsubscribe();
+    }
+  }, [prompt])
+
+  const refreshAll = useCallback(() => {
+    refreshGame();
+    refreshResponses();
+  }, [refreshGame, refreshResponses])
+
+  function renderResponses() {
+    if (responseLoadError) {
+      return <><Text>Unable to load responses: {responseLoadError}</Text></>
+    }
+    if (!responses || responses.length == 0) {
+      return <></>
+    }
+    return (<>
+      <Heading text="Answers"></Heading>
+      {responses.map((r) =>
+        <Pressable onPress={() => { setReponsesCorrect((old) => { return { ...old, [r.id]: !old[r.id] } }) }}>
+          <ListItem containerStyle={styles.listItem} key={r.id}>
+            <ListItem.Content >
+              <ListItem.Title style={styles.listTitle}>{r.answer}</ListItem.Title>
+            </ListItem.Content>
+            {responsesCorrect[r.id] ? <Icon name="check"></Icon> : <Icon name="help"></Icon>}
+          </ListItem >
+        </Pressable>
+      )}
+    </>)
+  }
+
   return (
-    <ScrollView contentContainerStyle={styles.container}
+    <ScrollView contentContainerStyle={lStyles.container}
       refreshControl={
-        <RefreshControl refreshing={false} onRefresh={refreshGame}></RefreshControl>
+        <RefreshControl refreshing={false} onRefresh={refreshAll}></RefreshControl>
       }>
       {renderGame()}
+      {renderResponses()}
     </ScrollView>
   )
 }
 
-const styles = StyleSheet.create({
+const lStyles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 5,
