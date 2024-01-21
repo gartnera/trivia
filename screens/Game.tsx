@@ -96,6 +96,7 @@ export default function Game({ navigation, route }: GameScreenProps) {
         { onConflict: "team_id,game_prompt_id" }
       );
     if (res.error) {
+      setSubmitState(null);
       setSubmitError(`code: ${res.error.code} message: ${res.error.message}`);
       return;
     }
