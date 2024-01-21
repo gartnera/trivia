@@ -1,5 +1,5 @@
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { View, StyleSheet, Platform } from "react-native"
+import { View, StyleSheet, Platform, NativeModules } from "react-native"
 import { RootStackParamList } from "~/types";
 import * as AppleAuthentication from 'expo-apple-authentication'
 import { supabase } from "~/lib/supabase";
@@ -7,7 +7,57 @@ import { Button, useTheme, useThemeMode, Text } from '@rneui/themed'
 import { useDefaultStyles } from "~/lib/styles";
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+let googleSignIn: any;
+try {
+  googleSignIn = require('@react-native-google-signin/google-signin')
+} catch {
+  console.log("unable to import google signin")
+}
+
 type WelcomeScreenProps = NativeStackScreenProps<RootStackParamList, 'Welcome'>;
+
+function getGoogleLogin() {
+  if (!googleSignIn) {
+    return <></>
+  }
+  // disable on iOS for now
+  if (Platform.OS === 'ios') {
+    return <></>
+  }
+  const themeMode = useThemeMode();
+
+  googleSignIn.GoogleSignin.configure({
+    webClientId: '10251924816-no9o263ekmbrna780ne0m0l5f1h3d8rv.apps.googleusercontent.com'
+  })
+
+  return (
+    <googleSignIn.GoogleSigninButton
+      size={googleSignIn.GoogleSigninButton.Size.Wide}
+      color={themeMode.mode == "light" ? googleSignIn.GoogleSigninButton.Color.Light : googleSignIn.GoogleSigninButton.Color.Dark}
+      style={lStyles.loginButton}
+      onPress={async () => {
+        try {
+          await googleSignIn.GoogleSignin.hasPlayServices()
+          const userInfo = await googleSignIn.GoogleSignin.signIn()
+          console.log(userInfo)
+          if (userInfo.idToken) {
+            const { data, error } = await supabase.auth.signInWithIdToken({
+              provider: 'google',
+              token: userInfo.idToken,
+            })
+            if (error) {
+              console.error("supabase login error", error)
+            }
+          } else {
+            console.error("no identity token")
+          }
+        } catch (error: any) {
+          console.error("google sign in error", error)
+        }
+      }}
+    />
+  )
+}
 
 function getPlatformNativeLogin() {
   const themeMode = useThemeMode();
@@ -36,7 +86,6 @@ function getPlatformNativeLogin() {
                 provider: 'apple',
                 token: credential.identityToken,
               })
-              console.log(JSON.stringify({ error, user }, null, 2))
               if (!error) {
                 // User is signed in.
               }
@@ -53,7 +102,7 @@ function getPlatformNativeLogin() {
         }}
       />
     )
-  return <>{/* Implement Android Auth options. */}</>
+  return <></>
 }
 
 export default function Welcome({ navigation, route }: WelcomeScreenProps) {
@@ -65,6 +114,7 @@ export default function Welcome({ navigation, route }: WelcomeScreenProps) {
         <Text>Please login to save your progress and rankings</Text>
         <View style={lStyles.loginButtons}>
           {getPlatformNativeLogin()}
+          {getGoogleLogin()}
           <Button title="Login with Email" style={lStyles.loginButton} onPress={() => navigation.navigate("EmailAuth")}></Button>
         </View>
       </View>
