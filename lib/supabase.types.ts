@@ -103,6 +103,13 @@ export interface Database {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "game_prompts_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "simple_scoreboard"
+            referencedColumns: ["game_id"]
+          },
+          {
             foreignKeyName: "game_prompts_prompt_id_fkey"
             columns: ["prompt_id"]
             isOneToOne: false
@@ -148,6 +155,13 @@ export interface Database {
             isOneToOne: false
             referencedRelation: "games"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "game_team_category_bonus_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "simple_scoreboard"
+            referencedColumns: ["game_id"]
           },
           {
             foreignKeyName: "game_team_category_bonus_team_id_fkey"
@@ -405,6 +419,13 @@ export interface Database {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "team_games_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "simple_scoreboard"
+            referencedColumns: ["game_id"]
+          },
+          {
             foreignKeyName: "team_games_team_id_fkey"
             columns: ["team_id"]
             isOneToOne: false
@@ -536,6 +557,16 @@ export interface Database {
             referencedColumns: ["id"]
           }
         ]
+      }
+      simple_scoreboard: {
+        Row: {
+          game_id: number | null
+          max_possible_score: number | null
+          score: number | null
+          team_name: string | null
+          total_submission_speed: number | null
+        }
+        Relationships: []
       }
       team_game_prompts: {
         Row: {

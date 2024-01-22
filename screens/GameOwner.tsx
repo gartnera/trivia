@@ -124,7 +124,7 @@ export default function GameOwner({ navigation, route }: GameOwnerScreenProps) {
       headingText = "Waiting to start"
     }
     return <>
-      <Heading iconName="circle" iconColor={statusColor} text={headingText}></Heading>
+      <Heading iconName="circle" iconColor={statusColor} text={headingText} iconPress={() => { navigation.navigate("Scoreboard", { game_id: game.id }) }}></Heading>
       <Button style={lStyles.button} disabled={advanceDisabled} onPress={advanceGame}>Advance Game</Button>
       <Button style={lStyles.button} onLongPress={resetGame} color="red">Reset Game (long press)</Button>
     </>

@@ -43,4 +43,7 @@ export type RootStackParamList = {
     score_updated_at: string | null
     answer: string | null
   }
+  Scoreboard: {
+    game_id: number
+  }
 }

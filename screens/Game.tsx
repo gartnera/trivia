@@ -123,8 +123,18 @@ export default function Game({ navigation, route }: GameScreenProps) {
     }
     const disabled = prompt && prompt ? prompt.closed_at != null : false;
     const submitIcon = submitState == 'success' ? <Icon name="done"></Icon> : undefined
+    let statusColor = 'white'
+    if (prompt?.closed_at) {
+      statusColor = 'red'
+    } else if (game.current_round && prompt) {
+      statusColor = 'green'
+    }
+    let headingText = `Round ${game.current_round}, Question ${game.round_position}`
+    if (!game.current_round) {
+      headingText = "Waiting to start"
+    }
     return <>
-      <Heading text={`Round ${game.current_round}, Question ${game.round_position}`}></Heading>
+      <Heading iconName="circle" iconColor={statusColor} text={headingText} iconPress={() => { navigation.navigate("Scoreboard", { game_id: game.id }) }}></Heading>
       <Input autoFocus={true} placeholder="Your Answer" onChangeText={setAnswer} value={answer} disabled={disabled} errorMessage={submitError}></Input>
       <Button disabled={disabled} loading={submitState == 'processing'} onPress={submit} icon={submitIcon} iconRight={true}>Submit</Button>
     </>

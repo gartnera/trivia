@@ -21,6 +21,7 @@ import TournamentOwner from './screens/TournamentOwner';
 import GameOwner from './screens/GameOwner';
 import CreateGame from './screens/modals/CreateGame';
 import AnswerInfo from './screens/modals/AnswerInfo';
+import Scoreboard from './screens/modals/Scoreboard';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -109,6 +110,9 @@ function Navigation() {
             </Stack.Group>
             <Stack.Group screenOptions={{ presentation: 'modal' }}>
               <Stack.Screen name="AnswerInfo" component={AnswerInfo} options={{ title: "Answer Details" }} />
+            </Stack.Group>
+            <Stack.Group screenOptions={{ presentation: 'modal' }}>
+              <Stack.Screen name="Scoreboard" component={Scoreboard} options={{ title: "Scoreboard" }} />
             </Stack.Group>
           </>
         )}
