@@ -102,7 +102,7 @@ export default function Game({ navigation, route }: GameScreenProps) {
     }
     setSubmitError("");
     setSubmitState('success')
-  }, [route, game, answer])
+  }, [route, game, answer, prompt])
 
 
   function renderGame() {

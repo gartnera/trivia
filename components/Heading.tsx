@@ -4,6 +4,7 @@ import { Text, Icon } from '@rneui/themed';
 export interface HeadingProps {
   text: string,
   iconName?: string,
+  iconColor?: string,
   iconPress?(): void,
 }
 
@@ -12,7 +13,7 @@ export default function Heading(props: HeadingProps) {
     <View style={styles.container}>
       <Text h2={true}>{props.text}</Text>
       {props.iconName &&
-        <Icon size={40} style={styles.icon} name={props.iconName} onPress={() => props.iconPress!()}></Icon>
+        <Icon size={40} style={styles.icon} name={props.iconName} color={props.iconColor} onPress={() => props.iconPress && props.iconPress()}></Icon>
       }
     </View>
   )

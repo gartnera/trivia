@@ -113,8 +113,18 @@ export default function GameOwner({ navigation, route }: GameOwnerScreenProps) {
       return <><Text>Unable to load games: {loadError}</Text></>
     }
     const advanceDisabled = game.completed_at != null
+    let statusColor = 'white'
+    if (prompt?.closed_at) {
+      statusColor = 'red'
+    } else if (game.current_round && prompt) {
+      statusColor = 'green'
+    }
+    let headingText = `Round ${game.current_round}, Question ${game.round_position}`
+    if (!game.current_round) {
+      headingText = "Waiting to start"
+    }
     return <>
-      <Heading text={`Round ${game.current_round}, Question ${game.round_position}`}></Heading>
+      <Heading iconName="circle" iconColor={statusColor} text={headingText}></Heading>
       <Button style={lStyles.button} disabled={advanceDisabled} onPress={advanceGame}>Advance Game</Button>
       <Button style={lStyles.button} onLongPress={resetGame} color="red">Reset Game (long press)</Button>
     </>
