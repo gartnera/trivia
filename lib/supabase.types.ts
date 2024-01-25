@@ -610,7 +610,20 @@ export interface Database {
           rounds: number
           prompts_per_round: number
         }
-        Returns: undefined
+        Returns: {
+          advance_ctr: number | null
+          category_bonus_enabled: boolean | null
+          completed_at: string | null
+          created_at: string | null
+          current_round: number | null
+          id: number
+          join_code: string | null
+          round_position: number | null
+          started_at: string | null
+          total_round_positions: number | null
+          total_rounds: number | null
+          tournament_id: number
+        }
       }
       join_game: {
         Args: {
